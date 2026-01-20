@@ -27,25 +27,14 @@ const Navbar: React.FC = () => {
             {/* Main Bar */}
             <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    {/* Hamburger Icon (Mobile Only) */}
-                    <button
-                        className="visible-mobile"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.2rem' }}
-                    >
-                        ☰
-                    </button>
+                {/* Logo (Left Side) */}
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>
+                    <img src="/gourmetify.jpg" alt="Gourmetify" style={{ height: '40px', borderRadius: '4px' }} />
+                    <span style={{ color: 'var(--primary)' }}>Gourmetify</span>
+                </Link>
 
-                    {/* Logo */}
-                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>
-                        <img src="/gourmetify.jpg" alt="Gourmetify" style={{ height: '40px', borderRadius: '4px' }} />
-                        <span style={{ color: 'var(--primary)' }}>Gourmetify</span>
-                    </Link>
-                </div>
-
-                {/* Search Bar (Desktop) */}
-                <form onSubmit={handleSearch} className="hidden-mobile" style={{ flex: '0 1 400px' }}>
+                {/* Search Bar (Desktop Center) */}
+                <form onSubmit={handleSearch} className="hidden-mobile" style={{ flex: '0 1 400px', margin: '0 2rem' }}>
                     <div style={{ position: 'relative' }}>
                         <input
                             type="text"
@@ -57,20 +46,22 @@ const Navbar: React.FC = () => {
                     </div>
                 </form>
 
-                {/* Icons */}
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                {/* Icons & Actions (Right Side) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+
                     {/* Desktop Links */}
                     <div className="hidden-mobile" style={{ display: 'flex', gap: '1.5rem', fontSize: '0.9rem', fontWeight: '500', marginRight: '1rem' }}>
                         <Link to="/">Home</Link>
                         <Link to="/shop">Shop</Link>
-                        {user?.email === 'admin@example.com' && <Link to="/admin/orders">Admin</Link>}
+                        {user?.email === 'gourmetify25@gmail.com' && <Link to="/admin/orders">Admin</Link>}
                     </div>
 
-                    <Link to="/cart" style={{ position: 'relative' }}>
-                        <span style={{ fontSize: '1.2rem' }}>🛒</span>
+                    {/* Cart Icon */}
+                    <Link to="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '1.6rem', color: '#333' }}>shopping_cart</span>
                         {cartCount > 0 && (
                             <span style={{
-                                position: 'absolute', top: '-8px', right: '-8px',
+                                position: 'absolute', top: '-5px', right: '-5px',
                                 background: 'var(--primary)', color: '#fff',
                                 borderRadius: '50%', width: '18px', height: '18px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -81,25 +72,30 @@ const Navbar: React.FC = () => {
                         )}
                     </Link>
 
+                    {/* Profile Icon (Mobile & Desktop) */}
+                    <Link to={user ? "/my-orders" : "/admin/login"} style={{ display: 'flex', alignItems: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '1.6rem', color: '#333' }}>account_circle</span>
+                    </Link>
+
+                    {/* Desktop User Info (Hidden on Mobile) */}
                     {user ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            {user.photoURL ? (
-                                <img src={user.photoURL} alt="Profile" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                            ) : (
-                                <span style={{ fontSize: '1.2rem' }}>👤</span>
-                            )}
-                            <div style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
-                                <Link to="/my-orders" style={{ fontWeight: 'bold' }}>My Orders</Link>
-                                <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, color: '#666' }}>Logout</button>
-                            </div>
+                        <div className="hidden-mobile" style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                            <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#666' }}>Logout</button>
                         </div>
                     ) : (
-                        <button
-                            onClick={loginWithGoogle}
-                            style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                            Login
-                        </button>
+                        <div className="hidden-mobile">
+                            <button onClick={loginWithGoogle} style={{ fontSize: '0.9rem', fontWeight: 'bold', border: 'none', background: 'none', cursor: 'pointer' }}>Login</button>
+                        </div>
                     )}
+
+                    {/* Hamburger Menu (Mobile Only - Far Right) */}
+                    <button
+                        className="visible-mobile"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                    >
+                        <span className="material-symbols-outlined" style={{ fontSize: '1.8rem', color: '#333' }}>menu</span>
+                    </button>
                 </div>
             </div>
 
