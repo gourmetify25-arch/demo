@@ -141,100 +141,154 @@ const ProductDetail: React.FC = () => {
         {/* Left Column: Gallery + Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-          <div style={{ display: 'flex', gap: '1rem', height: '450px', marginBottom: '2rem' }}>
-            {/* Vertical Thumbnails */}
+          <div className="product-gallery" style={{ display: 'flex', gap: '1rem', height: '500px', marginBottom: '2rem' }}>
+            {/* Thumbnail List */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '12px',
               overflowY: 'auto',
-              width: '70px',
+              width: '80px',
               flexShrink: 0,
-              paddingRight: '5px'
+              paddingRight: '4px'
             }} className="no-scrollbar">
-              {/* Combine main image (if not in images array) + images array for the full list. 
-                      However, to simplify based on user constraint: just show all available images unique. */}
               {[product.image, ...(product.images || [])]
-                .filter((item, index, self) => self.indexOf(item) === index && item) // Unique & Truthy
-                .slice(0, 5) // Max 5 limit display
+                .filter((item, index, self) => self.indexOf(item) === index && item)
+                .slice(0, 5)
                 .map((img, idx) => (
                   <div
                     key={idx}
-                    onMouseEnter={() => setSelectedImage(img)} // Hover usually better for desktop, click for mobile
+                    onMouseEnter={() => setSelectedImage(img)}
                     onClick={() => setSelectedImage(img)}
                     style={{
-                      width: '60px',
-                      height: '60px',
-                      border: `2px solid ${selectedImage === img ? '#d946ef' : '#e5e7eb'}`, // Pinkish border for selected
-                      borderRadius: '4px',
+                      width: '70px',
+                      height: '70px',
+                      border: `2px solid ${selectedImage === img ? 'var(--primary)' : 'transparent'}`,
+                      borderRadius: '8px',
                       cursor: 'pointer',
                       overflow: 'hidden',
-                      opacity: selectedImage === img ? 1 : 0.7,
-                      transition: 'all 0.2s'
+                      padding: '4px',
+                      background: selectedImage === img ? '#fff7ed' : '#f9fafb',
+                      transition: 'all 0.2s',
                     }}
                   >
-                    <img src={img} alt={`Thumb ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src={img} alt={`Thumb ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                   </div>
                 ))}
             </div>
 
-            {/* Main Image Area */}
+            {/* Main Image */}
             <div style={{
               flex: 1,
-              border: '1px solid #e5e7eb',
-              borderRadius: '4px',
+              background: '#f9fafb',
+              borderRadius: '16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '1rem',
+              padding: '2rem',
               position: 'relative',
               overflow: 'hidden'
             }}>
               <img
                 src={selectedImage || product.image}
                 alt={product.name}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transition: 'transform 0.3s' }}
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
               />
               {isOfferActive && (
                 <span style={{
                   position: 'absolute',
-                  top: '10px',
-                  right: '10px',
+                  top: '16px',
+                  left: '16px',
                   background: 'var(--danger)',
                   color: 'white',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.8rem',
-                  fontWeight: 'bold',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  padding: '6px 14px',
+                  borderRadius: '30px',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  boxShadow: '0 4px 6px rgba(220, 38, 38, 0.2)'
                 }}>
                   {Math.round(((product.mrp! - effectivePrice) / product.mrp!) * 100)}% OFF
                 </span>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        {/* Product Info */}
+        <div style={{ padding: '0 1rem' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            {product.brand || 'THE CHEESE CO.'}
+          </div>
+
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '800', margin: '0 0 1rem', lineHeight: '1.2', color: '#1f2937' }}>{product.name}</h1>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <span style={{ color: '#F59E0B', fontSize: '1.1rem' }}>★★★★☆</span>
+            <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>4.8 (124 reviews)</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            {isOfferActive && product.mrp ? (
+              <>
+                <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>₹{effectivePrice}</span>
+                <span style={{ textDecoration: 'line-through', color: '#9ca3af', fontSize: '1.2rem', marginTop: '0.5rem' }}>₹{product.mrp}</span>
+                <span style={{ background: '#000', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', height: 'fit-content', marginTop: '0.5rem' }}>
+                  {Math.round(((product.mrp - effectivePrice) / product.mrp) * 100)}% OFF
+                </span>
+              </>
+            ) : (
+              <span style={{ fontSize: '2.5rem', fontWeight: '800', color: '#1f2937' }}>₹{product.price}</span>
+            )}
+            <span style={{ color: '#6b7280', fontSize: '1rem' }}>/ {product.weight}g</span>
+          </div>
+
+          <p style={{ color: '#4b5563', lineHeight: '1.7', marginBottom: '2rem', fontSize: '1rem' }}>
+            {product.description}
+          </p>
+
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'stretch', marginBottom: '2rem', flexWrap: 'wrap' }}>
+            {/* Quantity */}
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff' }}>
+              <button
+                onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                style={{ padding: '0 1rem', height: '100%', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#374151' }}
+              >-</button>
+              <span style={{ width: '40px', textAlign: 'center', fontWeight: '600', fontSize: '1.1rem' }}>{quantity}</span>
+              <button
+                onClick={() => setQuantity(q => Math.min((product.stock || 0), q + 1))}
+                disabled={quantity >= (product.stock || 0)}
+                style={{ padding: '0 1rem', height: '100%', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#374151' }}
+              >+</button>
+            </div>
+
+            {/* Add to Cart */}
             <button
               onClick={handleAddToCart}
               disabled={(product.stock || 0) <= 0}
               className="btn"
               style={{
-                background: '#fff',
-                color: '#000',
-                border: '1px solid #000',
-                padding: '1rem',
+                flex: 1,
+                background: 'var(--primary)',
+                color: '#fff',
+                border: 'none',
+                padding: '1rem 2rem',
                 fontWeight: 'bold',
                 fontSize: '1rem',
-                borderRadius: '4px',
-                textTransform: 'uppercase',
-                opacity: (product.stock || 0) <= 0 ? 0.5 : 1,
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 4px 6px rgba(234, 88, 12, 0.3)',
+                opacity: (product.stock || 0) <= 0 ? 0.7 : 1,
                 cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              Add to Cart
+              <span className="material-symbols-outlined">shopping_bag</span>
+              {(product.stock || 0) <= 0 ? 'Out of Stock' : 'Add to Cart'}
             </button>
+
+            {/* Buy Now (Secondary/Checkout) */}
             <button
               onClick={async () => {
                 if ((product.stock || 0) <= 0) return;
@@ -257,112 +311,53 @@ const ProductDetail: React.FC = () => {
                 navigate('/checkout');
               }}
               disabled={(product.stock || 0) <= 0}
-              className="btn"
               style={{
-                background: '#9f2089', // Meesho-like purple/pink
-                color: '#fff',
-                border: 'none',
-                padding: '1rem',
+                background: '#f3f4f6',
+                color: '#1f2937',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                padding: '0 1.5rem',
                 fontWeight: 'bold',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                textTransform: 'uppercase',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                opacity: (product.stock || 0) <= 0 ? 0.5 : 1,
-                cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer'
+                cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer',
+                opacity: (product.stock || 0) <= 0 ? 0.5 : 1
               }}
             >
               Buy Now
             </button>
+
+            <button style={{ padding: '0 1rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span className="material-symbols-outlined" style={{ color: '#ef4444' }}>favorite</span>
+            </button>
           </div>
-
-        </div>
-
-        {/* Product Info */}
-        <div>
-          <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: 'var(--success)', background: '#ECFDF5', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
-            100% Vegetarian
-          </span>
-
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '1rem 0 0.5rem' }}>{product.name}</h1>
-          <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1.5rem' }}>⭐⭐⭐⭐⭐ (156 Reviews)</p>
-
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>
-            {isOfferActive && product.mrp ? (
-              <>
-                <span style={{ fontSize: '2.5rem', color: 'var(--primary)' }}>₹{effectivePrice}</span>
-                <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '1.2rem', marginLeft: '1rem' }}>MRP ₹{product.mrp}</span>
-                <span style={{ fontSize: '1rem', background: 'var(--danger)', color: 'white', padding: '2px 8px', borderRadius: '4px', marginLeft: '1rem', verticalAlign: 'middle' }}>
-                  {Math.round(((product.mrp - effectivePrice) / product.mrp) * 100)}% OFF
-                </span>
-              </>
-            ) : product.mrp && product.mrp > product.price ? (
-              <>
-                <span style={{ fontSize: '2.5rem', color: 'var(--text-dark)' }}>₹{product.price}</span>
-                <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '1.2rem', marginLeft: '1rem' }}>MRP ₹{product.mrp}</span>
-              </>
-            ) : (
-              <span>₹{product.price}</span>
-            )}
-            <span style={{ fontSize: '1.2rem', color: '#999', fontWeight: 'normal', marginLeft: '0.5rem' }}>/ {product.weight}g</span>
-          </div>
-          {isOfferActive && (
-            <div style={{ marginBottom: '1rem', color: 'var(--danger)', fontWeight: 'bold' }}>
-              Generic Offer Valid from {product.offerStartDate} to {product.offerEndDate}
-            </div>
-          )}
-          <div style={{ color: 'var(--success)', fontSize: '0.9rem', marginBottom: '2rem' }}>Inclusive of all taxes</div>
-
-          <p style={{ color: '#555', lineHeight: '1.6', marginBottom: '2rem' }}>
-            {product.description}
-          </p>
-
-          {/* Stock Status */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            {(product.stock || 0) <= 0 ? (
-              <span style={{ color: 'red', fontWeight: 'bold', fontSize: '1.2rem', padding: '0.5rem 1rem', background: '#ffebee', borderRadius: '4px' }}>
-                Out of Stock
-              </span>
-            ) : (
-              <span style={{ color: 'green', fontWeight: 'bold' }}>
-                In Stock: {(product.stock || 0) < 10 ? <span style={{ color: '#eab308' }}>Only {product.stock} left!</span> : product.stock}
-              </span>
-            )}
-          </div>
-
-          {/* Quantity Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '4px', opacity: (product.stock || 0) <= 0 ? 0.5 : 1 }}>
-              <button
-                onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                disabled={(product.stock || 0) <= 0}
-                style={{ padding: '0.6rem 1rem', background: 'none', border: 'none', cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer', fontSize: '1.2rem' }}
-              >
-                -
-              </button>
-              <span style={{ padding: '0.6rem 1rem', minWidth: '40px', textAlign: 'center', fontWeight: 'bold' }}>{quantity}</span>
-              <button
-                onClick={() => setQuantity(q => Math.min((product.stock || 0), q + 1))}
-                disabled={(product.stock || 0) <= 0 || quantity >= (product.stock || 0)}
-                style={{ padding: '0.6rem 1rem', background: 'none', border: 'none', cursor: (product.stock || 0) <= 0 || quantity >= (product.stock || 0) ? 'not-allowed' : 'pointer', fontSize: '1.2rem' }}
-              >
-                +
-              </button>
-            </div>
-            {(product.stock || 0) > 0 && quantity >= (product.stock || 0) && <span style={{ color: 'red', fontSize: '0.8rem' }}>Max quantity reached</span>}
-          </div>
-
 
           {/* Trust Badges */}
-          <div style={{ display: 'flex', gap: '2rem', fontSize: '0.9rem', color: '#666', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>🌿</span> Natural Ingredients
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '2.5rem' }}>
+            <div style={{ background: '#fff', border: '1px solid #f3f4f6', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '50%', color: 'var(--primary)' }}>
+                <span className="material-symbols-outlined">verified</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#111' }}>100% Authentic</div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Direct from makers</div>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>🛡️</span> Authentic Brand
+            <div style={{ background: '#fff', border: '1px solid #f3f4f6', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '50%', color: 'var(--primary)' }}>
+                <span className="material-symbols-outlined">security</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#111' }}>Secure Payment</div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Encrypted transactions</div>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>🚚</span> Secure Delivery
+            <div style={{ background: '#fff', border: '1px solid #f3f4f6', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '50%', color: 'var(--primary)' }}>
+                <span className="material-symbols-outlined">local_shipping</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#111' }}>Fast Delivery</div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Available nationwide</div>
+              </div>
             </div>
           </div>
 
