@@ -1,0 +1,5 @@
+{
+  "name": "SnackBazaar E-Commerce",
+  "description": "A production-ready e-commerce UI for an Indian snack store featuring a complete customer shopping flow (Home, Shop, Product, Cart, Checkout, Confirmation) and a separate Admin dashboard for managing orders and products.",
+  "requestFramePermissions": []
+}
