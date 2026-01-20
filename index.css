@@ -172,6 +172,35 @@ select:focus {
   .grid-products {
     grid-template-columns: 1fr !important;
   }
+
+  /* Product Details Mobile */
+  .grid-product-detail {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .product-gallery {
+    flex-direction: column-reverse !important;
+    height: auto !important;
+  }
+
+  .product-gallery>div:first-child {
+    /* Thumbnails */
+    flex-direction: row !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 10px;
+  }
+
+  .product-gallery-main {
+    height: 300px !important;
+  }
+
+  .trust-badges {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* Hero Section Styles */

@@ -135,7 +135,7 @@ const ProductDetail: React.FC = () => {
         <Link to="/">Home</Link> / <Link to="/shop">Shop</Link> / <span style={{ color: '#333' }}>{product.category}</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+      <div className="grid-product-detail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
 
         {/* Product Image */}
         {/* Left Column: Gallery + Buttons */}
@@ -178,7 +178,7 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Main Image */}
-            <div style={{
+            <div className="product-gallery-main" style={{
               flex: 1,
               background: '#f9fafb',
               borderRadius: '16px',
@@ -261,17 +261,17 @@ const ProductDetail: React.FC = () => {
               >+</button>
             </div>
 
-            {/* Add to Cart */}
+            {/* Add to Cart (Secondary) */}
             <button
               onClick={handleAddToCart}
               disabled={(product.stock || 0) <= 0}
               className="btn"
               style={{
                 flex: 1,
-                background: 'var(--primary)',
-                color: '#fff',
-                border: 'none',
-                padding: '1rem 2rem',
+                background: '#fff',
+                color: 'var(--primary)',
+                border: '1px solid var(--primary)',
+                padding: '1rem 1.5rem',
                 fontWeight: 'bold',
                 fontSize: '1rem',
                 borderRadius: '8px',
@@ -279,16 +279,15 @@ const ProductDetail: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.5rem',
-                boxShadow: '0 4px 6px rgba(234, 88, 12, 0.3)',
                 opacity: (product.stock || 0) <= 0 ? 0.7 : 1,
                 cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer'
               }}
             >
-              <span className="material-symbols-outlined">shopping_bag</span>
+              <span className="material-symbols-outlined">shopping_cart</span>
               {(product.stock || 0) <= 0 ? 'Out of Stock' : 'Add to Cart'}
             </button>
 
-            {/* Buy Now (Secondary/Checkout) */}
+            {/* Buy Now (Primary) */}
             <button
               onClick={async () => {
                 if ((product.stock || 0) <= 0) return;
@@ -312,14 +311,17 @@ const ProductDetail: React.FC = () => {
               }}
               disabled={(product.stock || 0) <= 0}
               style={{
-                background: '#f3f4f6',
-                color: '#1f2937',
-                border: '1px solid #e5e7eb',
+                background: 'var(--primary)',
+                color: '#fff',
+                border: 'none',
                 borderRadius: '8px',
-                padding: '0 1.5rem',
+                padding: '1rem 2rem',
                 fontWeight: 'bold',
+                fontSize: '1rem',
                 cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer',
-                opacity: (product.stock || 0) <= 0 ? 0.5 : 1
+                opacity: (product.stock || 0) <= 0 ? 0.5 : 1,
+                boxShadow: '0 4px 6px rgba(234, 88, 12, 0.3)',
+                flex: 1
               }}
             >
               Buy Now
@@ -331,7 +333,7 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Trust Badges */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '2.5rem' }}>
+          <div className="trust-badges" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '2.5rem' }}>
             <div style={{ background: '#fff', border: '1px solid #f3f4f6', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
               <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '50%', color: 'var(--primary)' }}>
                 <span className="material-symbols-outlined">verified</span>
