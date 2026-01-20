@@ -74,7 +74,11 @@ const Navbar: React.FC = () => {
 
                     {/* Profile Icon (Mobile & Desktop) */}
                     <Link to={user ? "/my-orders" : "/admin/login"} style={{ display: 'flex', alignItems: 'center' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '1.6rem', color: '#333' }}>account_circle</span>
+                        {user?.photoURL ? (
+                            <img src={user.photoURL} alt="Profile" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #eee' }} />
+                        ) : (
+                            <span className="material-symbols-outlined" style={{ fontSize: '1.8rem', color: '#333' }}>account_circle</span>
+                        )}
                     </Link>
 
                     {/* Desktop User Info (Hidden on Mobile) */}
