@@ -244,36 +244,49 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features Bar */}
-      <section className="features-section">
-        <div className="container features-container">
-          <div className="feature-item">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">🛡️</div>
+      <section className="features-section" style={{ background: '#fff', padding: '1.5rem 0', borderBottom: '1px solid #f0f0f0' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+
+          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
+            <div style={{ background: '#e0f2fe', padding: '12px', borderRadius: '50%', color: '#0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+              <span className="material-symbols-outlined">verified_user</span>
             </div>
-            <div className="feature-text">
-              <h3>100% Authentic</h3>
-              <p>Sourced directly from famous vendors</p>
-            </div>
-          </div>
-          <div className="feature-item">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">🚚</div>
-            </div>
-            <div className="feature-text">
-              <h3>Free Shipping</h3>
-              <p>On all orders above ₹499</p>
+            <div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>100% Authentic</h3>
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>Sourced directly from famous vendors</p>
             </div>
           </div>
-          <div className="feature-item">
-            <div className="feature-icon-wrapper">
-              <div className="feature-icon">↩️</div>
+
+          <div style={{ width: '1px', height: '40px', background: '#e5e7eb', display: 'none' }} className="desktop-divider"></div>
+
+          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
+            <div style={{ background: '#fff7ed', padding: '12px', borderRadius: '50%', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+              <span className="material-symbols-outlined">local_shipping</span>
             </div>
-            <div className="feature-text">
-              <h3>Easy Returns</h3>
-              <p>No questions asked return policy</p>
+            <div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>Free Shipping</h3>
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>On all orders above ₹1099</p>
             </div>
           </div>
+
+          <div style={{ width: '1px', height: '40px', background: '#e5e7eb', display: 'none' }} className="desktop-divider"></div>
+
+          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
+            <div style={{ background: '#dcfce7', padding: '12px', borderRadius: '50%', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
+              <span className="material-symbols-outlined">assignment_return</span>
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>Easy Returns</h3>
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>No questions asked return policy</p>
+            </div>
+          </div>
+
         </div>
+        <style>{`
+          @media (min-width: 768px) {
+            .desktop-divider { display: block !important; }
+          }
+        `}</style>
       </section>
 
       {/* Categories */}

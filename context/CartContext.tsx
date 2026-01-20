@@ -88,8 +88,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const chargeableWeight = Math.ceil(totalWeight / 1000);
 
   // Shipping = ₹40 per chargeable kg
-  // If weight is 0 (empty cart), shipping is 0
-  const shippingCost = chargeableWeight * 40;
+  // Free Shipping on orders above ₹1099
+  const shippingCost = subtotal > 1099 ? 0 : (chargeableWeight * 40);
 
   const total = subtotal + shippingCost;
 
