@@ -21,8 +21,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            // specific logic for admin check, for now simple check
-            setIsAdmin(currentUser?.email === 'admin@example.com');
+            // specific logic for admin check
+            setIsAdmin(currentUser?.email === 'gourmetify25@gmail.com');
             setLoading(false);
         });
         return unsubscribe;

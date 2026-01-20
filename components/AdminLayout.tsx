@@ -1,8 +1,17 @@
 import React from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext';
 
 const AdminLayout: React.FC = () => {
   const location = useLocation();
+  const { user, isAdmin, loading } = useAuth();
+
+  if (loading) return <div className="p-10 text-center">Loading...</div>;
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
 
   const isActive = (path: string) => location.pathname === path;
 
