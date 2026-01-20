@@ -455,7 +455,7 @@ const Shop: React.FC = () => {
                 )}
 
                 {/* Modified: Image Container with Aspect Ratio */}
-                <div style={{ position: 'relative', paddingTop: '100%', background: '#fffff' }}> {/* Square Aspect Ratio */}
+                <div style={{ position: 'relative', paddingTop: '100%', background: '#fff' }}> {/* Square Aspect Ratio */}
                   <img
                     src={product.image}
                     alt={product.name}
@@ -466,7 +466,7 @@ const Shop: React.FC = () => {
                       width: '100%',
                       height: '100%',
                       objectFit: 'contain',
-                      padding: '1.5rem'
+                      padding: '0.2rem'
                     }}
                   />
                 </div>
