@@ -75,6 +75,16 @@ const AdminLayout: React.FC = () => {
             <span className="material-symbols-outlined mr-3">tag</span>
             Keywords
           </Link>
+          <Link
+            to="/admin/categories"
+            className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive('/admin/categories')
+              ? 'bg-primary-50 text-primary-700'
+              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+          >
+            <span className="material-symbols-outlined mr-3">category</span>
+            Categories
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-gray-200">

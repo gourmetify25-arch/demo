@@ -28,6 +28,8 @@ import Migrate from './pages/admin/Migrate';
 import Brands from './pages/admin/Brands';
 import BrandForm from './pages/admin/BrandForm';
 import Keywords from './pages/admin/Keywords';
+import Categories from './pages/admin/Categories';
+import CategoryForm from './pages/admin/CategoryForm';
 
 const App: React.FC = () => {
   return (
@@ -61,6 +63,9 @@ const App: React.FC = () => {
                 <Route path="brands/new" element={<BrandForm />} />
                 <Route path="brands/:id" element={<BrandForm />} />
                 <Route path="keywords" element={<Keywords />} />
+                <Route path="categories" element={<Categories />} />
+                <Route path="categories/new" element={<CategoryForm />} />
+                <Route path="categories/:id" element={<CategoryForm />} />
                 <Route path="migrate" element={<Migrate />} />
               </Route>
 

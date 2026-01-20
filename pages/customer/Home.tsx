@@ -13,9 +13,16 @@ const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
 
+  const [categories, setCategories] = useState<{ id: string, name: string, image: string }[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch Categories
+        const categoriesSnap = await getDocs(collection(db, 'categories'));
+        const categoriesList = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+        setCategories(categoriesList);
+
         // Fetch Featured Products
         const qFeatured = query(collection(db, 'products'), where('featured', '==', true), limit(4));
         const featuredSnap = await getDocs(qFeatured);
@@ -76,12 +83,12 @@ const Home: React.FC = () => {
   const nextSlide = () => setCurrentSlide(prev => (prev + 1) % topOffers.length);
   const prevSlide = () => setCurrentSlide(prev => (prev - 1 + topOffers.length) % topOffers.length);
 
-  const categories = [
-    { name: 'Chips', image: 'https://images.unsplash.com/photo-1566478919030-26d9c28642dd?q=80&w=300&auto=format&fit=crop' },
-    { name: 'Sweets', image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?q=80&w=300&auto=format&fit=crop' },
-    { name: 'Nuts', image: 'https://images.unsplash.com/photo-1536591375315-196000ea3677?q=80&w=300&auto=format&fit=crop' },
-    { name: 'Spices', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=300&auto=format&fit=crop' },
-  ];
+  // const categories = [
+  //   { name: 'Chips', image: 'https://images.unsplash.com/photo-1566478919030-26d9c28642dd?q=80&w=300&auto=format&fit=crop' },
+  //   { name: 'Sweets', image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?q=80&w=300&auto=format&fit=crop' },
+  //   { name: 'Nuts', image: 'https://images.unsplash.com/photo-1536591375315-196000ea3677?q=80&w=300&auto=format&fit=crop' },
+  //   { name: 'Spices', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=300&auto=format&fit=crop' },
+  // ];
 
   return (
     <div className="home-container">
