@@ -42,9 +42,9 @@ const Footer: React.FC = () => {
                     {/* Contact */}
                     <div>
                         <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>Contact</h4>
-                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📍 123 Snack St, Bangalore</p>
-                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📞 +91 98765 43210</p>
-                        <p style={{ color: '#666', fontSize: '0.9rem' }}>✉️ support@gourmetify.com</p>
+                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📍 Opp Moulana Hospital, Ootty Road, Perinthalmanna, Kerala</p>
+                        <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📞 +91 75101 41171</p>
+                        <p style={{ color: '#666', fontSize: '0.9rem' }}>✉️ gourmetify25@gmail.com</p>
                     </div>
                 </div>
 
