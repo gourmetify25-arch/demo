@@ -77,10 +77,10 @@ const Home: React.FC = () => {
   const prevSlide = () => setCurrentSlide(prev => (prev - 1 + topOffers.length) % topOffers.length);
 
   const categories = [
-    { name: 'Chips', image: 'https://placehold.co/100x100/orange/white?text=Chips' },
-    { name: 'Sweets', image: 'https://placehold.co/100x100/pink/white?text=Sweets' },
-    { name: 'Nuts', image: 'https://placehold.co/100x100/brown/white?text=Nuts' },
-    { name: 'Spices', image: 'https://placehold.co/100x100/red/white?text=Spices' },
+    { name: 'Chips', image: 'https://images.unsplash.com/photo-1566478919030-26d9c28642dd?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Sweets', image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Nuts', image: 'https://images.unsplash.com/photo-1536591375315-196000ea3677?q=80&w=300&auto=format&fit=crop' },
+    { name: 'Spices', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=300&auto=format&fit=crop' },
   ];
 
   return (
