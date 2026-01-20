@@ -26,13 +26,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  /* eslint-disable @typescript-eslint/ban-ts-comment */
   const addToCart = (product: Product, quantity = 1) => {
+    // @ts-ignore
+    const availableStock = product.stock !== undefined ? product.stock : Infinity;
+
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
+
       if (existing) {
+        if (existing.quantity + quantity > availableStock) {
+          alert(`Sorry, only ${availableStock} items available in stock`);
+          return prev;
+        }
+
         return prev.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
+      }
+
+      if (quantity > availableStock) {
+        alert(`Sorry, only ${availableStock} items available in stock`);
+        return prev;
       }
       return [...prev, { ...product, quantity }];
     });
@@ -44,9 +59,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateQuantity = (productId: string, quantity: number) => {
     if (quantity < 1) return;
-    setCart((prev) =>
-      prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
-    );
+
+    setCart((prev) => {
+      const item = prev.find(i => i.id === productId);
+      if (!item) return prev;
+
+      // @ts-ignore
+      const availableStock = item.stock !== undefined ? item.stock : Infinity;
+
+      if (quantity > availableStock) {
+        alert(`Sorry, only ${availableStock} items available in stock`);
+        return prev;
+      }
+
+      return prev.map((item) => (item.id === productId ? { ...item, quantity } : item));
+    });
   };
 
   const clearCart = () => setCart([]);
