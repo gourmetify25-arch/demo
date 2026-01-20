@@ -39,7 +39,8 @@ const Navbar: React.FC = () => {
 
                     {/* Logo */}
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>
-                        <span style={{ color: 'var(--primary)' }}>Snack</span>Bazaar
+                        <img src="/gourmetify.jpg" alt="Gourmetify" style={{ height: '40px', borderRadius: '4px' }} />
+                        <span style={{ color: 'var(--primary)' }}>Gourmetify</span>
                     </Link>
                 </div>
 

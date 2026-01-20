@@ -9,8 +9,9 @@ const Footer: React.FC = () => {
 
                     {/* Brand */}
                     <div>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-                            <span style={{ color: 'var(--primary)' }}>Snack</span>Bazaar
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <img src="/gourmetify.jpg" alt="Gourmetify" style={{ height: '30px', borderRadius: '4px' }} />
+                            <span style={{ color: 'var(--primary)' }}>Gourmetify</span>
                         </h3>
                         <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: '1.6' }}>
                             Authentic Indian flavors delivered to your doorstep. From spicy banana chips to sweet mysore pak.
@@ -43,12 +44,12 @@ const Footer: React.FC = () => {
                         <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>Contact</h4>
                         <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📍 123 Snack St, Bangalore</p>
                         <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>📞 +91 98765 43210</p>
-                        <p style={{ color: '#666', fontSize: '0.9rem' }}>✉️ support@snackbazaar.in</p>
+                        <p style={{ color: '#666', fontSize: '0.9rem' }}>✉️ support@gourmetify.com</p>
                     </div>
                 </div>
 
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', textAlign: 'center', color: '#999', fontSize: '0.8rem' }}>
-                    &copy; {new Date().getFullYear()} SnackBazaar. All rights reserved.
+                    &copy; {new Date().getFullYear()} Gourmetify. All rights reserved.
                 </div>
             </div>
         </footer>

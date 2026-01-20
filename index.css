@@ -1,11 +1,15 @@
 :root {
-  --primary: #2563EB;
-  --primary-dark: #1E40AF;
-  --secondary: #F3F4F6;
+  --primary: #EA580C;
+  /* Orange 600 */
+  --primary-dark: #C2410C;
+  /* Orange 700 */
+  --secondary: #FFF7ED;
+  /* Orange 50 */
   --text-dark: #1F2937;
   --text-light: #6B7280;
   --white: #FFFFFF;
-  --accent: #F59E0B;
+  --accent: #F97316;
+  /* Orange 500 */
   --danger: #EF4444;
   --success: #10B981;
 
