@@ -61,6 +61,9 @@ export interface Order {
   items: CartItem[];
   shippingCost: number;
   trackingId?: string;
+  paymentId?: string;
+  paymentMethod?: string;
+  paymentStatus?: 'Pending' | 'Paid' | 'Failed';
 }
 
 export enum PaymentMethod {
