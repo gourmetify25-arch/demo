@@ -16,7 +16,7 @@ declare global {
 }
 
 // TODO: Replace with your actual Test Key ID
-const RAZORPAY_KEY_ID = "rzp_test_YOUR_KEY_HERE";
+const RAZORPAY_KEY_ID = "rzp_test_S6S6pVc2i44mgE";
 
 const Checkout: React.FC = () => {
   const { cart, subtotal, totalWeight, chargeableWeight, shippingCost, total, clearCart } = useCart();
