@@ -1,8 +1,9 @@
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
+import { WishlistProvider } from './context/WishlistContext';
 
 // Layouts
 import CustomerLayout from './components/CustomerLayout';
@@ -16,6 +17,13 @@ import Cart from './pages/customer/Cart';
 import Checkout from './pages/customer/Checkout';
 import OrderConfirmation from './pages/customer/OrderConfirmation';
 import MyOrders from './pages/customer/MyOrders';
+import Contact from './pages/customer/Contact';
+import About from './pages/customer/About';
+import FAQ from './pages/customer/FAQ';
+import Terms from './pages/customer/Terms';
+import Privacy from './pages/customer/Privacy';
+import CategoriesPage from './pages/customer/Categories';
+import Wishlist from './pages/customer/Wishlist';
 
 // Admin Pages
 import Login from './pages/admin/Login';
@@ -34,9 +42,10 @@ import CategoryForm from './pages/admin/CategoryForm';
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <CartProvider>
-        <ToastProvider>
-          <HashRouter>
+      <WishlistProvider>
+        <CartProvider>
+          <ToastProvider>
+            <BrowserRouter>
             <Routes>
               {/* Customer Routes */}
               <Route path="/" element={<CustomerLayout />}>
@@ -47,6 +56,13 @@ const App: React.FC = () => {
                 <Route path="checkout" element={<Checkout />} />
                 <Route path="order-confirmation" element={<OrderConfirmation />} />
                 <Route path="my-orders" element={<MyOrders />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="about" element={<About />} />
+                <Route path="faq" element={<FAQ />} />
+                <Route path="terms" element={<Terms />} />
+                <Route path="privacy" element={<Privacy />} />
+                <Route path="categories" element={<CategoriesPage />} />
+                <Route path="wishlist" element={<Wishlist />} />
               </Route>
 
               {/* Admin Routes */}
@@ -72,10 +88,11 @@ const App: React.FC = () => {
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </HashRouter>
+          </BrowserRouter>
         </ToastProvider>
       </CartProvider>
-    </AuthProvider>
+    </WishlistProvider>
+  </AuthProvider>
   );
 };
 

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { useNavigate, Link } from 'react-router-dom';
+import { collection, query, where, limit, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Product, Brand } from '../../types';
 
 import BestOfferPopup from '../../components/BestOfferPopup';
+import ProductCard from '../../components/ProductCard';
 
 const Home: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -14,6 +15,12 @@ const Home: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   const [categories, setCategories] = useState<{ id: string, name: string, image: string }[]>([]);
+  const [displayProducts, setDisplayProducts] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortOption, setSortOption] = useState('Recommended');
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,22 +28,63 @@ const Home: React.FC = () => {
         // Fetch Categories
         const categoriesSnap = await getDocs(collection(db, 'categories'));
         const categoriesList = categoriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
-        setCategories(categoriesList);
+        
+        // Helper to check for invisible characters (like U+3164)
+        const isInvalid = (str: string) => !str || str.trim().length === 0 || str.includes('ㅤ');
 
-        // Fetch Featured Products
-        const qFeatured = query(collection(db, 'products'), where('featured', '==', true), limit(4));
+        // Pre-process categories from collection to handle invalid names
+        const categoriesFromDB = categoriesSnap.docs.map(doc => {
+          const data = doc.data();
+          const cleanName = isInvalid(data.name) ? doc.id : data.name;
+          return {
+            id: doc.id,
+            name: cleanName,
+            image: data.image
+          };
+        });
+        
+        // Fetch Featured Products for the section
+        const qFeatured = query(collection(db, 'products'), where('featured', '==', true), limit(20));
         const featuredSnap = await getDocs(qFeatured);
         const featuredList = featuredSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
         setFeaturedProducts(featuredList);
+        setDisplayProducts(featuredList);
 
         // Fetch Brands
         const brandsSnap = await getDocs(collection(db, 'brands'));
         const brandsList = brandsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Brand[];
         setBrands(brandsList);
 
-        // Fetch All Products for Offers
+        // Fetch All Products for Offers and to derive valid Categories
         const allProductsSnap = await getDocs(collection(db, 'products'));
         const allProducts = allProductsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
+
+        // Derive unique categories from products (these are usually correct strings)
+        const productCategories = [...new Set(allProducts.map(p => p.category).filter(c => !isInvalid(c)))];
+        
+        // Build final categories list by matching product categories to DB documents
+        const finalCategories = productCategories.map(catName => {
+          // Match by name or ID (case-insensitive)
+          const matched = categoriesFromDB.find(c => 
+            c.name.toLowerCase() === catName.toLowerCase() || 
+            c.id.toLowerCase() === catName.toLowerCase()
+          );
+          
+          return {
+            id: matched?.id || catName,
+            name: catName,
+            image: matched?.image || 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=200&auto=format&fit=crop'
+          };
+        });
+
+        // Also include any categories from the DB that weren't in products but have valid names
+        categoriesFromDB.forEach(c => {
+          if (!productCategories.some(pc => pc.toLowerCase() === c.name.toLowerCase())) {
+            finalCategories.push(c);
+          }
+        });
+
+        setCategories(finalCategories);
 
         const today = new Date().toISOString().split('T')[0];
         const activeOffers = allProducts.filter(p => {
@@ -55,7 +103,7 @@ const Home: React.FC = () => {
 
         setTopOffers(activeOffers.slice(0, 10));
 
-        // Show popup logic: Only if we have an offer and haven't shown it this session
+        // Show popup logic
         if (activeOffers.length > 0) {
           const hasSeenPopup = sessionStorage.getItem('hasSeenBestOfferPopup');
           if (!hasSeenPopup) {
@@ -70,6 +118,42 @@ const Home: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  // Combined Filter and Sort Logic
+  useEffect(() => {
+    const applyFiltersAndSort = async () => {
+      let filtered: Product[] = [];
+      
+      if (selectedCategory === 'All') {
+        filtered = [...featuredProducts];
+      } else {
+        try {
+          const q = query(collection(db, 'products'), where('category', '==', selectedCategory), limit(20));
+          const snap = await getDocs(q);
+          filtered = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Product[];
+        } catch (error) {
+          console.error("Error filtering products:", error);
+          filtered = [];
+        }
+      }
+
+      // Apply Sorting
+      const sorted = [...filtered];
+      if (sortOption === 'Price: Low to High') {
+        sorted.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
+      } else if (sortOption === 'Price: High to Low') {
+        sorted.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
+      } else if (sortOption === 'Recommended') {
+        // No sorting needed, already in default order
+      }
+
+      setDisplayProducts(sorted);
+    };
+
+    if (featuredProducts.length > 0 || selectedCategory !== 'All') {
+      applyFiltersAndSort();
+    }
+  }, [selectedCategory, sortOption, featuredProducts]);
 
   // Auto-slide effect
   useEffect(() => {
@@ -100,11 +184,8 @@ const Home: React.FC = () => {
         />
       )}
 
-      {/* Hero Section */}
-      {/* Hero Section */}
-      {/* Hero Section */}
-      {/* Hero Section */}
-      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden', height: '320px', background: '#222' }}>
+      {/* Hero Section - Hidden on Mobile */}
+      <section className="hero-section hidden-mobile" style={{ position: 'relative', overflow: 'hidden', height: '320px', background: '#222' }}>
         {topOffers.length > 0 ? (
           <>
             {topOffers.map((offer, index) => (
@@ -243,118 +324,160 @@ const Home: React.FC = () => {
         )}
       </section>
 
-      {/* Features Bar */}
-      <section className="features-section" style={{ background: '#fff', padding: '1.5rem 0', borderBottom: '1px solid #f0f0f0' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
 
-          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
-            <div style={{ background: '#e0f2fe', padding: '12px', borderRadius: '50%', color: '#0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-              <span className="material-symbols-outlined">verified_user</span>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>100% Authentic</h3>
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>Sourced directly from famous vendors</p>
-            </div>
-          </div>
-
-          <div style={{ width: '1px', height: '40px', background: '#e5e7eb', display: 'none' }} className="desktop-divider"></div>
-
-          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
-            <div style={{ background: '#fff7ed', padding: '12px', borderRadius: '50%', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-              <span className="material-symbols-outlined">local_shipping</span>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>Free Shipping</h3>
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>On all orders above ₹1099</p>
-            </div>
-          </div>
-
-          <div style={{ width: '1px', height: '40px', background: '#e5e7eb', display: 'none' }} className="desktop-divider"></div>
-
-          <div className="feature-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', justifyContent: 'center' }}>
-            <div style={{ background: '#dcfce7', padding: '12px', borderRadius: '50%', color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-              <span className="material-symbols-outlined">assignment_return</span>
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.2rem' }}>Easy Returns</h3>
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>No questions asked return policy</p>
-            </div>
-          </div>
-
-        </div>
-        <style>{`
-          @media (min-width: 768px) {
-            .desktop-divider { display: block !important; }
-          }
-        `}</style>
-      </section>
-
-      {/* Categories */}
-      <section className="container" style={{ padding: '4rem 1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <h2 className="section-title" style={{ marginBottom: 0 }}>Shop by Category</h2>
-          <Link to="/shop" style={{ color: 'var(--primary)', fontWeight: '600' }}>View All &rarr;</Link>
-        </div>
-
-        <div className="grid-2-mobile" style={{ display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>
-          {categories.map((cat) => (
-            <Link to={`/shop?cat=${cat.name}`} key={cat.name} style={{ textAlign: 'center', group: 'hover' }}>
-              <div style={{
-                width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden',
-                marginBottom: '1rem', border: '2px solid transparent', transition: 'all 0.3s',
-                boxShadow: 'var(--shadow)'
-              }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
-              >
-                <img src={cat.image} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      {/* Categories - Mobile Horizontal Scroll / Desktop Grid */}
+      <section className="container" style={{ padding: '1rem 1rem' }}>
+        <div className="visible-mobile">
+          <div className="horizontal-scroll">
+            <Link to="/categories" className="category-circle-item">
+              <div className="category-circle-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff0f0' }}>
+                <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '2rem' }}>apps</span>
               </div>
-              <h3 style={{ fontWeight: '600' }}>{cat.name}</h3>
+              <div className="category-circle-name">Categories</div>
             </Link>
-          ))}
+            {categories.map((cat) => (
+              <Link to={`/shop?cat=${cat.name}`} key={cat.id} className="category-circle-item">
+                <img src={cat.image} alt={cat.name} className="category-circle-img" />
+                <div className="category-circle-name">{cat.name}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden-mobile">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>Shop by Category</h2>
+            <Link to="/shop" style={{ color: 'var(--primary)', fontWeight: '600' }}>View All &rarr;</Link>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>
+            {categories.map((cat) => (
+              <Link to={`/shop?cat=${cat.name}`} key={cat.id} style={{ textAlign: 'center', group: 'hover' }}>
+                <div style={{
+                  width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden',
+                  marginBottom: '1rem', border: '2px solid transparent', transition: 'all 0.3s',
+                  boxShadow: 'var(--shadow)'
+                }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                >
+                  <img src={cat.image} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <h3 style={{ fontWeight: '600' }}>{cat.name}</h3>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section style={{ background: '#f5f7fa', padding: '4rem 0' }}>
+      {/* Featured Products / All Products */}
+      <section style={{ background: '#f8f9fa', padding: '1rem 0 4rem 0' }}>
         <div className="container">
-          <h2 className="section-title">Featured Products</h2>
-          <div className="grid-products">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
-                  <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  {product.featured && (
-                    <span className="badge" style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--danger)', color: '#fff' }}>
-                      HOT
-                    </span>
-                  )}
-                </div>
-                <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                    {product.category}
-                  </div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', flex: 1 }}>
-                    <Link to={`/product/${product.id}`}>{product.name}</Link>
-                  </h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                    <div>
-                      {product.mrp && product.mrp > product.price ? (
-                        <>
-                          <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>₹{product.price}</span>
-                          <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9rem', marginLeft: '0.5rem' }}>₹{product.mrp}</span>
-                        </>
-                      ) : (
-                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>₹{product.price}</span>
-                      )}
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginLeft: '0.5rem' }}>/ {product.weight}g</span>
-                    </div>
-                    <Link to={`/product/${product.id}`} className="btn btn-outline" style={{ padding: '0.4rem 0.8rem' }}>
-                      Add +
-                    </Link>
+          <div className="visible-mobile">
+            <h2 className="section-title">Products For You</h2>
+            {/* Mobile Filter Tabs */}
+            <div className="mobile-filter-tabs">
+              <div className="filter-tab-item" onClick={() => setShowSortMenu(true)}>
+                <span className="material-symbols-outlined">swap_vert</span> Sort
+              </div>
+              <div className="filter-tab-item" onClick={() => setShowCategoryMenu(true)}>
+                Category <span className="material-symbols-outlined">expand_more</span>
+              </div>
+              <div className="filter-tab-item" onClick={() => navigate('/shop')}>
+                <span className="material-symbols-outlined">filter_list</span> Filters
+              </div>
+            </div>
+
+            {/* Sort Overlay */}
+            {showSortMenu && (
+              <div className="mobile-overlay" onClick={() => setShowSortMenu(false)}>
+                <div className="mobile-menu-bottom" onClick={e => e.stopPropagation()}>
+                  <div className="menu-header">Sort By</div>
+                  <div className="menu-options">
+                    {['Recommended', 'Price: Low to High', 'Price: High to Low'].map(opt => (
+                      <div 
+                        key={opt} 
+                        className={`menu-option-item ${sortOption === opt ? 'active' : ''}`}
+                        onClick={() => { setSortOption(opt); setShowSortMenu(false); }}
+                      >
+                        {opt}
+                        {sortOption === opt && <span className="material-symbols-outlined">check</span>}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Category Overlay */}
+            {showCategoryMenu && (
+              <div className="mobile-overlay" onClick={() => setShowCategoryMenu(false)}>
+                <div className="mobile-menu-bottom" onClick={e => e.stopPropagation()}>
+                  <div className="menu-header">Select Category</div>
+                  <div className="menu-options" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    <div 
+                      className={`menu-option-item ${selectedCategory === 'All' ? 'active' : ''}`}
+                      onClick={() => { setSelectedCategory('All'); setShowCategoryMenu(false); }}
+                    >
+                      All Categories
+                    </div>
+                    {categories.map(cat => (
+                      <div 
+                        key={cat.id} 
+                        className={`menu-option-item ${selectedCategory === cat.name ? 'active' : ''}`}
+                        onClick={() => { setSelectedCategory(cat.name); setShowCategoryMenu(false); }}
+                      >
+                        {cat.name}
+                        {selectedCategory === cat.name && <span className="material-symbols-outlined">check</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="hidden-mobile">
+            <div className="desktop-filter-bar">
+              <div className="filter-group">
+                <h2 className="section-title" style={{ margin: 0, marginRight: '1rem' }}>Products For You</h2>
+                <div 
+                  className={`filter-pill ${selectedCategory === 'All' ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory('All')}
+                >
+                  All
+                </div>
+                {categories.slice(0, 5).map(cat => (
+                  <div 
+                    key={cat.id}
+                    className={`filter-pill ${(selectedCategory === cat.name || selectedCategory === cat.id) ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat.name || cat.id)}
+                  >
+                    {cat.name || cat.id}
+                  </div>
+                ))}
+                {categories.length > 5 && (
+                  <Link to="/categories" className="filter-pill">More &hellip;</Link>
+                )}
+              </div>
+              
+              <div className="sort-select-wrapper">
+                <span style={{ fontSize: '0.9rem', color: '#666' }}>Sort By:</span>
+                <select 
+                  className="sort-select"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                >
+                  <option value="Recommended">Recommended</option>
+                  <option value="Price: Low to High">Price: Low to High</option>
+                  <option value="Price: High to Low">Price: High to Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid-products">
+            {displayProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

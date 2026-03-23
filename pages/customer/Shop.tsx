@@ -3,8 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Product, Brand } from '../../types';
-import { useCart } from '../../context/CartContext';
-import { useToast } from '../../context/ToastContext';
+import ProductCard from '../../components/ProductCard';
 
 const FilterSection = ({ title, children, defaultOpen = false }: { title: string, children: React.ReactNode, defaultOpen?: boolean }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -46,8 +45,6 @@ const FilterSection = ({ title, children, defaultOpen = false }: { title: string
 };
 
 const Shop: React.FC = () => {
-  const { addToCart } = useCart();
-  const { showToast } = useToast();
   const location = useLocation();
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -88,12 +85,18 @@ const Shop: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Sync URL search param with searchTerm state
+  // Sync URL search param with searchTerm and category state
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchParam = params.get('search') || '';
-    if (searchParam !== searchTerm) {
+    const catParam = params.get('category') || params.get('cat') || '';
+
+    if (searchParam && searchParam !== searchTerm) {
       setSearchTerm(searchParam);
+    }
+    
+    if (catParam && catParam !== selectedCategory) {
+      setSelectedCategory(catParam);
     }
   }, [location.search]);
 
@@ -164,17 +167,13 @@ const Shop: React.FC = () => {
   // Use fetched brands for the filter list
   const allBrands = ['All', ...brands.map(b => b.name)];
 
-  const handleAddToCart = (product: any) => {
-    addToCart({ ...product, quantity: 1 });
-    showToast(`${product.name} added to cart!`, 'success');
-  };
 
   if (loading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading products...</div>;
   }
 
   return (
-    <div className="container shop-container" style={{ margin: '2rem auto', display: 'flex', gap: '2rem' }}>
+    <div className="container shop-container" style={{ display: 'flex' }}>
 
       <div className="flex-col-mobile" style={{ display: 'flex', gap: '2rem', flexDirection: 'row', alignItems: 'flex-start', width: '100%' }}>
 
@@ -381,8 +380,20 @@ const Shop: React.FC = () => {
             /* Mobile/Tablet Portrait (Default) - 2 columns for better density */
             .products-grid-container {
                display: grid;
-               grid-template-columns: repeat(2, 1fr);
-               gap: 1rem;
+               grid-template-columns: 1fr;
+               gap: 1.5rem;
+               padding: 0 1rem;
+            }
+
+            @media (max-width: 480px) {
+               .products-grid-container {
+                  padding: 0;
+                  gap: 1.2rem;
+               }
+               .shop-container {
+                  padding-left: 0.5rem;
+                  padding-right: 0.5rem;
+               }
             }
 
             /* Tablet Landscape / Small Desktop (768px - 1024px) */
@@ -437,74 +448,7 @@ const Shop: React.FC = () => {
           {/* Products Grid */}
           <div className="products-grid-container">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="card product-card" style={{
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'relative',
-                border: '1px solid #eee',
-                borderRadius: '12px',
-                transition: 'all 0.2s ease',
-                background: '#fff',
-                overflow: 'hidden'
-              }}>
-                {/* Badges */}
-                {product.mrp && product.salePrice && ((product.mrp - product.salePrice) / product.mrp > 0.1) && (
-                  <span style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--danger)', color: '#fff', fontSize: '0.7rem', fontWeight: 'bold', padding: '0.3rem 0.6rem', borderRadius: '20px', zIndex: 5 }}>
-                    {Math.round(((product.mrp - product.salePrice) / product.mrp) * 100)}% OFF
-                  </span>
-                )}
-
-                {/* Modified: Image Container with Aspect Ratio */}
-                <div style={{ position: 'relative', paddingTop: '100%', background: '#fff' }}> {/* Square Aspect Ratio */}
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      position: 'absolute',
-                      top: '0',
-                      left: '0',
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      padding: '0.2rem'
-                    }}
-                  />
-                </div>
-
-                <div style={{ padding: '1.2rem', display: 'flex', flexDirection: 'column', flex: 1, borderTop: '1px solid #f5f5f5' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#999', textTransform: 'uppercase', marginBottom: '0.4rem', fontWeight: '600' }}>
-                    {product.category}
-                  </div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#333', lineHeight: '1.4' }}>
-                    <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>{product.name}</Link>
-                  </h3>
-
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginTop: 'auto', marginBottom: '1rem' }}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#111' }}>₹{product.salePrice || product.price}</span>
-                    {product.mrp && product.mrp > (product.salePrice || product.price) && (
-                      <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9rem' }}>₹{product.mrp}</span>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="btn btn-primary"
-                    disabled={(product.stock || 0) <= 0}
-                    style={{
-                      width: '100%',
-                      padding: '0.7rem',
-                      fontSize: '0.95rem',
-                      borderRadius: '8px',
-                      fontWeight: '600',
-                      background: (product.stock || 0) <= 0 ? '#9ca3af' : 'var(--primary)',
-                      border: 'none',
-                      cursor: (product.stock || 0) <= 0 ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    {(product.stock || 0) <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
-                </div>
-              </div>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

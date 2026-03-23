@@ -72,7 +72,7 @@ const Cart: React.FC = () => {
           <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Order Summary</h3>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#666' }}>
-            <span>Subtotal ({cart.length} items)</span>
+            <span>Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
             <span>₹{subtotal}</span>
           </div>
 

@@ -32,10 +32,11 @@ const Footer: React.FC = () => {
                     <div>
                         <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>Support</h4>
                         <ul style={{ listStyle: 'none', color: '#666', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <li><a href="#">Contact Us</a></li>
-                            <li><a href="#">Shipping Policy</a></li>
-                            <li><a href="#">Returns & Refunds</a></li>
-                            <li><a href="#">FAQs</a></li>
+                            <li><Link to="/contact">Contact Us</Link></li>
+                            <li><Link to="/about">About Us</Link></li>
+                            <li><Link to="/faq">FAQs</Link></li>
+                            <li><Link to="/privacy">Privacy Policy</Link></li>
+                            <li><Link to="/terms">Terms & Conditions</Link></li>
                         </ul>
                     </div>
 
@@ -49,7 +50,7 @@ const Footer: React.FC = () => {
                 </div>
 
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', textAlign: 'center', color: '#999', fontSize: '0.8rem' }}>
-                    &copy; {new Date().getFullYear()} Gourmetify. All rights reserved.
+                    &copy; 2026 Gourmetify. All rights reserved. Developed By <a href="https://futurinx.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: '600' }}>futurinx</a>
                 </div>
             </div>
         </footer>

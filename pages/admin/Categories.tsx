@@ -71,7 +71,7 @@ const Categories: React.FC = () => {
                                         className="h-10 w-10 rounded-full object-cover border border-gray-200"
                                     />
                                 </td>
-                                <td className="p-4 font-medium">{category.name}</td>
+                                <td className="p-4 font-medium">{category.name || category.id}</td>
                                 <td className="p-4 text-gray-500 text-sm">{category.description || '-'}</td>
                                 <td className="p-4 text-right space-x-2">
                                     <Link
